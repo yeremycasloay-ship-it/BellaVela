@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BellaVela - Tienda</title>
+  <link rel="stylesheet" href="sytle.css">
+</head>
+<body>
+  <header style="width:100%; padding:18px 24px; box-sizing:border-box; display:flex; justify-content:space-between; align-items:center; background:#ffffff">
+    <h1 style="margin:0; font-size:20px">BellaVela</h1>
+      <nav style="display:flex; align-items:center; gap:12px">
+      <a href="registro.html" style="color:#000; text-decoration:none">Registro</a>
+      <a id="contactLink" href="contacto.html" style="color:#000; text-decoration:none">Contacto</a>
+      <a id="cartButton" href="checkout.html" style="display:inline-flex; align-items:center; gap:8px; padding:6px 10px; background:rgba(0,0,0,0.06); border-radius:8px; text-decoration:none; color:#000">
+        <span class="cart-icon" style="font-size:18px">🛒</span>
+        <span id="cartCount">0</span>
+      </a>
+      <button id="resetInventoryButton" class="reset-inventory" title="Restablecer inventario">Reset Inventario</button>
+      <div id="restockTimer" style="margin-left:8px; font-size:13px; color:#333">Reposición en: --:--:--</div>
+    </nav>
+  </header>
+
+  <main style="max-width:1100px; margin:28px auto; padding:0 18px; box-sizing:border-box">
+    <section class="hero" style="margin-bottom:18px">
+      <h2 style="margin:0 0 8px">Velas aromáticas</h2>
+      <p style="margin:0 0 16px; color:#ffffff">Descubre nuestras velas hechas a mano con fragancias naturales.</p>
+    </section>
+
+    <section id="contact-card" class="contact-card" style="margin-bottom:18px">
+      <h3 id="welcomeTitle" style="margin:0 0 8px">Bienvenido</h3>
+      <div id="contactInfo">
+        <p id="noContact">No hay contacto registrado. <a href="index.html">Registrar contacto</a></p>
+        <div id="contactDetails" style="display:none">
+          <div><strong>Correo del cliente:</strong> <span id="contactEmail"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="product-grid">
+      <article class="product-card" data-name="Vela Lavanda" data-price="9.99" data-stock="20" data-img="images/vela_lavanda.jpg">
+        <div class="product-media"><img src="images/vela_lavanda.jpg" alt="Vela Lavanda" onerror="this.style.display='none'; this.parentElement.textContent='🕯️'"></div>
+        <h3>Vela Lavanda</h3>
+        <p>Relajante aroma a lavanda. 200g.</p>
+        <div class="product-actions">
+          <span class="price-details">$9.99 c/u Total: $9.99</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="Vela Eucalipto" data-price="11.50" data-stock="20" data-img="images/vela_eucalipto.jpg">
+        <div class="product-media"><img src="images/vela_eucalipto.jpg" alt="Vela Eucalipto" onerror="this.style.display='none'; this.parentElement.textContent='🌿'"></div>
+        <h3>Vela Eucalipto</h3>
+        <p>Refrescante aroma a eucalipto. 180g.</p>
+        <div class="product-actions">
+          <span class="price-details">$11.50 c/u Total: $11.50</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="Vela Rosas" data-price="12.00" data-stock="20" data-img="images/vela_rosas.jpg">
+        <div class="product-media"><img src="images/vela_rosas.jpg" alt="Vela Rosas" onerror="this.style.display='none'; this.parentElement.textContent='🌸'"></div>
+        <h3>Vela Rosas</h3>
+        <p>Suave aroma floral de rosas. 220g.</p>
+        <div class="product-actions">
+          <span class="price-details">$12.00 c/u Total: $12.00</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="Vela Cítricos" data-price="10.50" data-stock="20" data-img="images/vela_citricos.jpg">
+        <div class="product-media"><img src="images/vela_citricos.jpg" alt="Vela Cítricos" onerror="this.style.display='none'; this.parentElement.textContent='🍋'"></div>
+        <h3>Vela Cítricos</h3>
+        <p>Aromas frescos de limón y naranja. 200g.</p>
+        <div class="product-actions">
+          <span class="price-details">$10.50 c/u Total: $10.50</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="Vela Vainilla" data-price="13.00" data-stock="20" data-img="images/vela_vainilla.jpg">
+        <div class="product-media"><img src="images/vela_vainilla.jpg" alt="Vela Vainilla" onerror="this.style.display='none'; this.parentElement.textContent='🍮'"></div>
+        <h3>Vela Vainilla</h3>
+        <p>Suave y dulce aroma a vainilla. 210g.</p>
+        <div class="product-actions">
+          <span class="price-details">$13.00 c/u Total: $13.00</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="Vela Jazmín" data-price="14.25" data-stock="20" data-img="images/vela_jazmin.jpg">
+        <div class="product-media"><img src="images/vela_jazmin.jpg" alt="Vela Jazmín" onerror="this.style.display='none'; this.parentElement.textContent='🌼'"></div>
+        <h3>Vela Jazmín</h3>
+        <p>Notas florales intensas de jazmín. 200g.</p>
+        <div class="product-actions">
+          <span class="price-details">$14.25 c/u Total: $14.25</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+      
+      <article class="product-card" data-name="Vela Sándalo" data-price="15.00" data-stock="20" data-img="images/vela_sandalo.jpg">
+        <div class="product-media"><img src="images/vela_sandalo.jpg" alt="Vela Sándalo" onerror="this.style.display='none'; this.parentElement.textContent='🪵'"></div>
+        <h3>Vela Sándalo</h3>
+        <p>Aroma cálido y amaderado de sándalo. 200g.</p>
+        <div class="product-actions">
+          <span class="price-details">$15.00 c/u Total: $15.00</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="Vela Coco" data-price="11.50" data-stock="20" data-img="images/vela_coco.jpg">
+        <div class="product-media"><img src="images/vela_coco.jpg" alt="Vela Coco" onerror="this.style.display='none'; this.parentElement.textContent='🥥'"></div>
+        <h3>Vela Coco</h3>
+        <p>Aroma tropical suave a coco. 200g.</p>
+        <div class="product-actions">
+          <span class="price-details">$11.50 c/u Total: $11.50</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="Vela Té Verde" data-price="9.75" data-stock="20" data-img="images/vela_te_verde.jpg">
+        <div class="product-media"><img src="images/vela_te_verde.jpg" alt="Vela Té Verde" onerror="this.style.display='none'; this.parentElement.textContent='🍵'"></div>
+        <h3>Vela Té Verde</h3>
+        <p>Notas frescas de té verde y hojas. 190g.</p>
+        <div class="product-actions">
+          <span class="price-details">$9.75 c/u Total: $9.75</span>
+          <div class="actions-row">
+            <input class="qty-input" type="number" min="1" value="1" aria-label="Cantidad">
+            <button class="buy">Comprar</button>
+          </div>
+          <div class="stock-row">Disponibles: <span class="stock-info">20</span></div>
+        </div>
+      </article>
+    </section>
+
+   <!-- --- Pegar este bloque justo después de <body> --- -->
+<!-- Bloque de comprobación: pegar inmediatamente después de <body> -->
+<script>
+(function(){
+    try {
+        const regs = JSON.parse(localStorage.getItem('registrations') || '[]');
+        const flag = localStorage.getItem('userRegistered');
+
+        if (!Array.isArray(regs) || regs.length === 0 || flag !== '1') {
+            window.location.href = "no-registrado.html";
+        }
+    } catch(err) {
+        window.location.href = "no-registrado.html";
+    }
+})();
+(function(){
+
+    try {
+      const regs = JSON.parse(localStorage.getItem('registrations') || '[]');
+      const registeredFlag = localStorage.getItem('userRegistered');
+
+      if (!Array.isArray(regs) || regs.length === 0 || registeredFlag !== '1') {
+        window.location.replace("no-registrado.html");
+        return;
+      }
+    } catch (err) {
+        window.location.replace("no-registrado.html");
+    }
+  })();
+    (function(){
+
+    try {
+      // Si quieres forzar que además se compruebe que hay al menos 1 registro:
+      const regs = JSON.parse(localStorage.getItem('registrations') || '[]');
+      const registeredFlag = localStorage.getItem('userRegistered');
+
+      // Condición: no hay registros OR la bandera no está activa -> bloquear
+      if (!Array.isArray(regs) || regs.length === 0 || registeredFlag !== '1') {
+        // (Opcional) mensaje corto, puedes quitar alert si no quieres que aparezca.
+        // alert("Debes registrarte antes de ingresar.");
+        window.location.replace("index.html");
+        return;
+      }
+      // Si pasa la verificación, continúa normalmente
+    } catch (err) {
+      // Si hay algún error -> redirigir de forma segura
+      console.error('Error comprobando registro en inicio.html', err);
+      window.location.replace("index.html");
+    }
+  })();
+ (function(){
+
+        const RESTOCK_INTERVAL = 2 * 60 * 60 * 1000; 
+        function formatTime(ms){
+          const total = Math.max(0, Math.floor(ms/1000));
+          const h = Math.floor(total/3600); const m = Math.floor((total%3600)/60); const s = total%60;
+          return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+        }
+
+        function initRestock(){
+          const now = Date.now();
+          const last = parseInt(localStorage.getItem('lastRestock')||'0',10) || 0;
+          
+          if(!last){
+            localStorage.setItem('lastRestock', String(now));
+            return;
+          }
+          if(now - last >= RESTOCK_INTERVAL){
+           
+            const inv = {};
+            document.querySelectorAll('.product-card').forEach(function(card){
+              const name = card.getAttribute('data-name');
+              const stock = parseInt(card.getAttribute('data-stock')||'20',10) || 20;
+              inv[name] = stock;
+            });
+            localStorage.setItem('inventory', JSON.stringify(inv));
+            localStorage.setItem('lastRestock', String(now));
+          }
+        }
+
+        function updateRestockTimer(){
+          const last = parseInt(localStorage.getItem('lastRestock')||'0',10) || 0;
+          const next = last + RESTOCK_INTERVAL;
+          const diff = Math.max(0, next - Date.now());
+          const el = document.getElementById('restockTimer');
+          if(el) el.textContent = 'Reposición en: ' + formatTime(diff);
+        }
+
+        
+        initRestock();
+        setInterval(function(){ initRestock(); refreshStockDisplay(); updateRestockTimer(); }, 1000);
+
+        
+        function renderContact(){
+          try{
+              const regs = JSON.parse(localStorage.getItem('registrations')||'[]');
+              if(Array.isArray(regs) && regs.length){
+                const last = regs[regs.length-1] || {};
+                const name = last.name || last.nombre || '(sin nombre)';
+                const email = last.email || last.correo || '(sin correo)';
+                const welcome = document.getElementById('welcomeTitle');
+                if(welcome) welcome.textContent = 'Bienvenido "' + name + '"';
+                document.getElementById('contactEmail').textContent = email;
+                document.getElementById('noContact').style.display = 'none';
+                document.getElementById('contactDetails').style.display = '';
+                return;
+              }
+          }catch(e){}
+          
+          const noEl = document.getElementById('noContact');
+          const details = document.getElementById('contactDetails');
+          if(noEl) noEl.style.display = '';
+          if(details) details.style.display = 'none';
+        }
+
+      
+        renderContact();
+
+
+        function initInventory(){
+          try{
+            const existing = JSON.parse(localStorage.getItem('inventory') || 'null');
+            if(existing && typeof existing === 'object') return existing;
+          }catch(e){}
+          const inv = {};
+          document.querySelectorAll('.product-card').forEach(function(card){
+            const name = card.getAttribute('data-name');
+            const stock = parseInt(card.getAttribute('data-stock')||'20',10) || 0;
+            inv[name] = stock;
+          });
+          localStorage.setItem('inventory', JSON.stringify(inv));
+          return inv;
+        }
+        const inventory = initInventory();
+
+  
+        function refreshStockDisplay(){
+          document.querySelectorAll('.product-card').forEach(function(card){
+            const name = card.getAttribute('data-name');
+            const stockEl = card.querySelector('.stock-info');
+            const inv = JSON.parse(localStorage.getItem('inventory')||'{}');
+            const available = (inv[name] == null ? parseInt(card.getAttribute('data-stock')||'20',10) : inv[name]);
+            if(stockEl) stockEl.textContent = String(available);
+            const buyBtn = card.querySelector('.buy');
+            const qtyInput = card.querySelector('.qty-input');
+            if(available <= 0){ if(buyBtn) buyBtn.disabled = true; if(qtyInput) qtyInput.disabled = true; }
+            else { if(buyBtn) buyBtn.disabled = false; if(qtyInput) qtyInput.disabled = false; }
+          });
+        }
+        refreshStockDisplay();
+
+       
+        function resetInventoryToDefaults(){
+          const inv = {};
+          document.querySelectorAll('.product-card').forEach(function(card){
+            const name = card.getAttribute('data-name');
+            const stock = parseInt(card.getAttribute('data-stock')||'20',10) || 20;
+            inv[name] = stock;
+          });
+          localStorage.setItem('inventory', JSON.stringify(inv));
+          localStorage.setItem('lastRestock', String(Date.now()));
+          refreshStockDisplay();
+          updateRestockTimer();
+          updateCartCount();
+          alert('Inventario restablecido a valores iniciales.');
+        }
+
+        const resetBtn = document.getElementById('resetInventoryButton');
+        if(resetBtn) resetBtn.addEventListener('click', function(){ if(confirm('¿Restablecer inventario a valores iniciales?')) resetInventoryToDefaults(); });
+
+        function getCart(){
+          try{ return JSON.parse(localStorage.getItem('cart')||'[]') }catch(e){return[]}
+        }
+        function saveCart(cart){ localStorage.setItem('cart', JSON.stringify(cart)); updateCartCount(); }
+
+        function updateCartCount(){
+          try{
+            const cart = getCart();
+            const total = cart.reduce(function(s,i){ return s + (i.qty||0); }, 0);
+            const el = document.getElementById('cartCount');
+            if(el) el.textContent = total;
+          }catch(e){ console.error(e) }
+        }
+
+        
+        updateCartCount();
+
+        function formatCurrency(n){ return '$' + (Number(n) || 0).toFixed(2); }
+
+   
+        function updateProductTotals(){
+         
+          let inv = {};
+          try{ inv = JSON.parse(localStorage.getItem('inventory')||'{}') }catch(e){ inv = {} }
+          document.querySelectorAll('.product-card').forEach(function(card){
+            const name = card.getAttribute('data-name');
+            const unit = parseFloat(card.getAttribute('data-price')||'0') || 0;
+            const qtyInput = card.querySelector('.qty-input');
+            const detailsEl = card.querySelector('.price-details');
+            if(!qtyInput || !detailsEl) return;
+            let qty = Math.max(1, parseInt(qtyInput.value) || 1);
+            const available = (inv[name] == null ? parseInt(card.getAttribute('data-stock')||'20',10) : inv[name]);
+            if(qty > available){ qty = available; qtyInput.value = qty; }
+            const newText = formatCurrency(unit) + ' c/u Total: ' + formatCurrency(unit * qty);
+            const oldText = detailsEl.textContent;
+            if(oldText !== newText){
+              detailsEl.textContent = newText;
+              detailsEl.classList.add('flash');
+              setTimeout(function(){ detailsEl.classList.remove('flash'); }, 700);
+            }
+          });
+        }
+
+        document.querySelectorAll('.qty-input').forEach(function(input){
+          input.addEventListener('input', function(){
+            
+            let v = parseInt(input.value,10);
+            if(isNaN(v) || v < 1) v = 1;
+            input.value = v;
+            updateProductTotals();
+          });
+        });
+
+        updateProductTotals();
+
+        document.querySelectorAll('.product-card').forEach(function(card){
+          const btn = card.querySelector('.buy');
+          const qtyInput = card.querySelector('.qty-input');
+          if(!btn) return;
+          btn.addEventListener('click', function(){
+            const name = card.getAttribute('data-name') || card.querySelector('h3').innerText;
+            const price = parseFloat(card.getAttribute('data-price') || '0') || 0;
+            const qtyRequested = Math.max(1, parseInt(qtyInput && qtyInput.value) || 1);
+            const cart = getCart();
+            const existing = cart.find(function(i){ return i.name === name; });
+
+            
+            let inv = {};
+            try{ inv = JSON.parse(localStorage.getItem('inventory')||'{}') }catch(e){ inv = {} }
+            const available = (inv[name] == null ? parseInt(card.getAttribute('data-stock')||'20',10) : inv[name]);
+
+           
+            const reserved = existing ? (existing.qty || 0) : 0;
+            const remaining = Math.max(0, available - reserved);
+            if(remaining <= 0){ alert('Lo sentimos — no hay unidades disponibles de ' + name); return; }
+            const qtyToAdd = Math.min(qtyRequested, remaining);
+            if(qtyToAdd < qtyRequested){ alert('Solo hay ' + remaining + ' unidades disponibles. Se añadirá la cantidad máxima disponible.'); }
+
+            if(existing){
+              existing.qty = (existing.qty || 1) + qtyToAdd;
+            } else {
+              cart.push({ name: name, price: price, qty: qtyToAdd });
+            }
+            saveCart(cart);
+            
+            refreshStockDisplay();
+          
+            window.location.href = 'checkout.html';
+          });
+        });
+      })();
+    </script>
+  </main>
+
+  <footer style="text-align:center; padding:18px 0; color:#ffffff">© BellaVela</footer>
+
+</body>
+</html>

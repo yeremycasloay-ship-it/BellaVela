@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro - BellaVela</title>
+  <link rel="stylesheet" href="sytle.css" />
+
+  <style>
+    body, html { margin:0; padding:0; height:100%; }
+    .layout { display:flex; justify-content:center; align-items:center; height:100vh; padding:20px; box-sizing:border-box; }
+    .contenedor { background: rgba(255,255,255,0.95); padding:25px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); width:100%; max-width:430px; }
+    input, select { width:100%; padding:10px; border-radius:6px; border:1px solid #ddd; font-size:15px; box-sizing:border-box; }
+    .phone-container { display:flex; gap:8px; align-items:center; }
+    select { width:140px; max-width:40%; }
+    #flag { width:26px; height:18px; border-radius:3px; border:1px solid #ccc; }
+    #check { color:green; font-weight:700; font-size:20px; display:none; margin-left:8px; }
+    #msg { margin-top:10px; font-weight:600; min-height:20px; }
+    #ingresarBtn { display:none; margin-top:12px; padding:10px; background:#4caf50; color:#fff; border:none; border-radius:8px; cursor:pointer; width:100%; }
+    label { font-size:13px; color:#333; margin-top:6px; }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <div class="contenedor">
+    <h2>¿Aún no te has registrado?</h2>
+    <p>Regístrate aquí</p>
+
+    <form id="registroForm" style="display:flex; flex-direction:column; gap:10px;">
+      <input type="text" id="name" placeholder="Nombre" required />
+      <input type="number" id="age" placeholder="Edad" min="0" required />
+
+      <div class="phone-container">
+        <select id="countrySelect" aria-label="País">
+          <option value="+51" data-flag="https://flagcdn.com/w20/pe.png">🇵🇪 Perú (+51)</option>
+          <option value="+52" data-flag="https://flagcdn.com/w20/mx.png">🇲🇽 México (+52)</option>
+          <option value="+1"  data-flag="https://flagcdn.com/w20/us.png">🇺🇸 USA (+1)</option>
+          <option value="+34" data-flag="https://flagcdn.com/w20/es.png">🇪🇸 España (+34)</option>
+          <option value="+57" data-flag="https://flagcdn.com/w20/co.png">🇨🇴 Colombia (+57)</option>
+          <option value="+54" data-flag="https://flagcdn.com/w20/ar.png">🇦🇷 Argentina (+54)</option>
+          <option value="+56" data-flag="https://flagcdn.com/w20/cl.png">🇨🇱 Chile (+56)</option>
+        </select>
+
+        <input type="text" id="phone" inputmode="numeric" placeholder="Número (sin prefijo)" required />
+
+        <img id="flag" src="https://flagcdn.com/w20/pe.png" alt="bandera" />
+      </div>
+
+      <input type="email" id="email" placeholder="Correo electrónico" required />
+
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+
+      <label for="confirmPassword">Confirmar contraseña</label>
+      <input type="password" id="confirmPassword" placeholder="Repite tu contraseña" required>
+
+      <button type="submit" id="submitBtn" style="padding:10px; background:#ce6da2; color:white; border:none; border-radius:8px; cursor:pointer;">
+        Registrar
+      </button>
+
+      <div style="display:flex; align-items:center;">
+        <div id="msg"></div>
+        <span id="check">✓</span>
+      </div>
+
+      <button type="button" id="ingresarBtn">Ingresar</button>
+    </form>
+
+    <div style="margin-top:12px;">
+      <a href="index.html" style="color:#ce6da2; text-decoration:none;">Volver al inicio</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ================================
+      CONFIGURACIÓN POR PAÍS
+================================ */
+const countryMeta = {
+  "+51": { name:"Perú", digits:9, groups:[3,3,3], flag:"https://flagcdn.com/w20/pe.png" },
+  "+52": { name:"México", digits:10, groups:[3,3,4], flag:"https://flagcdn.com/w20/mx.png" },
+  "+1":  { name:"USA", digits:10, groups:[3,3,4], flag:"https://flagcdn.com/w20/us.png" },
+  "+34": { name:"España", digits:9, groups:[3,3,3], flag:"https://flagcdn.com/w20/es.png" },
+  "+57": { name:"Colombia", digits:10, groups:[3,3,4], flag:"https://flagcdn.com/w20/co.png" },
+  "+54": { name:"Argentina", digits:10, groups:[2,4,4], flag:"https://flagcdn.com/w20/ar.png" },
+  "+56": { name:"Chile", digits:9, groups:[3,3,3], flag:"https://flagcdn.com/w20/cl.png" }
+};
+
+/* ================================
+         CAPTURAR ELEMENTOS
+================================ */
+const form = document.getElementById("registroForm");
+const nameInput = document.getElementById("name");
+const ageInput = document.getElementById("age");
+const countrySelect = document.getElementById("countrySelect");
+const phoneInput = document.getElementById("phone");
+const emailInput = document.getElementById("email");
+const passInput = document.getElementById("password");
+const pass2Input = document.getElementById("confirmPassword");
+
+const msg = document.getElementById("msg");
+const check = document.getElementById("check");
+const ingresarBtn = document.getElementById("ingresarBtn");
+const submitBtn = document.getElementById("submitBtn");
+const flagImg = document.getElementById("flag");
+
+/* ================================
+    INICIALIZAR BANDERA POR DEFECTO
+================================ */
+(function initFlag() {
+  const opt = countrySelect.selectedOptions[0];
+  flagImg.src = opt.dataset.flag;
+})();
+
+/* ================================
+       CAMBIO DE PAÍS
+================================ */
+countrySelect.addEventListener("change", () => {
+  const opt = countrySelect.selectedOptions[0];
+  flagImg.src = opt.dataset.flag;
+  phoneInput.value = "";
+});
+
+/* ================================
+     EVITAR EDAD NEGATIVA
+================================ */
+ageInput.addEventListener("input", () => {
+  if (ageInput.value < 0) ageInput.value = 0;
+});
+
+/* ================================
+   FUNCIÓN FORMATEO TELÉFONO
+================================ */
+function formatByGroups(digitsOnly, groups) {
+  if (!digitsOnly) return "";
+  let res = "";
+  let idx = 0;
+  for (let g of groups) {
+    const part = digitsOnly.substring(idx, idx + g);
+    if (!part) break;
+    if (res) res += "-";
+    res += part;
+    idx += g;
+  }
+  return res;
+}
+
+/* ================================
+  FORMATEAR TELÉFONO EN TIEMPO REAL
+================================ */
+phoneInput.addEventListener("input", () => {
+  let digits = phoneInput.value.replace(/\D/g, "");
+  const meta = countryMeta[countrySelect.value];
+
+  if (!meta) return;
+
+  if (digits.length > meta.digits) digits = digits.slice(0, meta.digits);
+
+  phoneInput.value = formatByGroups(digits, meta.groups);
+});
+
+/* ================================
+     SUBMIT DEL REGISTRO
+================================ */
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = nameInput.value.trim();
+  const age = parseInt(ageInput.value);
+  const prefix = countrySelect.value;
+  const meta = countryMeta[prefix];
+  const email = emailInput.value.trim();
+  const pass = passInput.value;
+  const pass2 = pass2Input.value;
+  const phoneDigits = phoneInput.value.replace(/\D/g, "");
+
+  msg.style.color = "red";
+  msg.textContent = "";
+  check.style.display = "none";
+  ingresarBtn.style.display = "none";
+
+  if (!name || !email || !phoneInput.value) {
+    msg.textContent = "Todos los campos son obligatorios.";
+    return;
+  }
+
+  if (age < 18) {
+    msg.textContent = "Debes ser mayor de edad.";
+    return;
+  }
+
+  if (phoneDigits.length !== meta.digits) {
+    msg.textContent = `El número debe tener ${meta.digits} dígitos para ${meta.name}.`;
+    return;
+  }
+
+  if (pass.length < 6) {
+    msg.textContent = "La contraseña debe tener mínimo 6 caracteres.";
+    return;
+  }
+
+  if (pass !== pass2) {
+    msg.textContent = "Las contraseñas no coinciden.";
+    return;
+  }
+
+  const record = {
+    name,
+    age,
+    phone: `${prefix} ${phoneInput.value}`,
+    email,
+    password: pass,
+    country: meta.name,
+    created: new Date().toISOString()
+  };
+
+  const list = JSON.parse(localStorage.getItem("registrations") || "[]");
+  list.push(record);
+
+  localStorage.setItem("registrations", JSON.stringify(list));
+  localStorage.setItem("userRegistered", "1");
+
+  msg.textContent = "Registro aprobado.";
+  msg.style.color = "green";
+  check.style.display = "inline";
+  ingresarBtn.style.display = "block";
+});
+
+/* ================================
+     BOTÓN INGRESAR
+================================ */
+ingresarBtn.addEventListener("click", () => {
+  const flag = localStorage.getItem("userRegistered");
+  const list = JSON.parse(localStorage.getItem("registrations") || "[]");
+
+  if (flag === "1" && list.length > 0) {
+    window.location.href = "siguiente.html";
+  } else {
+    msg.textContent = "Primero debes registrarte.";
+    msg.style.color = "red";
+  }
+});
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+

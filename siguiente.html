@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Registro recibido</title>
+  <link rel="stylesheet" href="sytle.css">
+  <style>
+    .summary { max-width: 720px; margin: 32px auto; padding: 20px; background: rgba(255,255,255,0.85); border-radius: 10px; }
+    .summary h2 { margin-top: 0 }
+    .buttons { display:flex; gap:12px; margin-top:16px }
+    .buttons a { padding:10px 14px; border-radius:8px; text-decoration:none; border:none; cursor:pointer }
+    .btn-primary { background:#ce6da2; color:#fff }
+    .btn-secondary { background:#f0f0f0; color:#333 }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <div class="contenedor summary">
+      <h2 id="title">Cargando...</h2>
+      <div id="info">
+        <p>Verificando registro...</p>
+      </div>
+
+      <div class="buttons" id="buttons"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const title = document.getElementById('title');
+      const info = document.getElementById('info');
+      const buttons = document.getElementById('buttons');
+
+      const flag = localStorage.getItem('userRegistered');
+      const regs = JSON.parse(localStorage.getItem('registrations') || '[]');
+
+      // ❌ No registrado → redirigir al index
+      if (flag !== "1" || regs.length === 0) {
+        title.textContent = "Primero debes registrarte";
+        info.innerHTML = "<p>No se encontró un registro válido.</p>";
+
+        buttons.innerHTML = `
+          <a class="btn-primary" href="registro.html">Registrarse aquí</a>
+          <a class="btn-secondary" href="index.html">Volver al inicio</a>
+        `;
+
+        return;
+      }
+
+      // ✔ Sí registrado → mostrar información
+      const last = regs[regs.length - 1];
+
+      title.textContent = "Registro completado";
+      info.innerHTML = `
+        <p><strong>Nombre:</strong> ${last.name}</p>
+        <p><strong>Correo:</strong> ${last.email}</p>
+        <p><strong>Teléfono:</strong> ${last.phone}</p>
+        <p><strong>País:</strong> ${last.country}</p>
+        <p><strong>Fecha:</strong> ${new Date(last.created).toLocaleString()}</p>
+      `;
+
+      buttons.innerHTML = `
+        <a class="btn-primary" href="inicio.html">Ir a la tienda</a>
+        <a class="btn-secondary" href="index.html">Volver al inicio</a>
+      `;
+    })();
+  </script>
+
+</body>
+</html>
+

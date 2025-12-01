@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Checkout - BellaVela</title>
+  <link rel="stylesheet" href="sytle.css">
+  <style>
+    .checkout { max-width:900px; margin:36px auto; padding:18px; background:rgba(255,255,255,0.9); border-radius:10px }
+    .cart-list { margin-bottom:16px }
+    .cart-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee }
+    .checkout-form { margin-top:10px }
+    .checkout-form label { display:block; margin-bottom:6px; font-weight:600 }
+    .checkout-form input { width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #ccc }
+    .pay-btn { background:#2b8a7a; color:white; padding:10px 14px; border-radius:8px; border:none; cursor:pointer }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="left">
+      <div class="contenedor checkout">
+        <h2>Resumen de compra</h2>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px">
+          <button id="resetInventoryButton" class="reset-inventory" style="margin-right:6px">Reset Inventario</button>
+          <div id="restockTimer" style="font-size:13px; color:#333;">Reposición en: --:--:--</div>
+        </div>
+        <div id="cart" class="cart-list">
+          <p>Cargando carrito...</p>
+        </div>
+
+        <div id="paymentSection">
+          <h3>Pago con tarjeta</h3>
+          <form id="paymentForm" class="checkout-form">
+          <label>Nombre en la tarjeta</label>
+          <input type="text" id="cardName" placeholder="Nombre como aparece en la tarjeta" required>
+
+          <label>Número de tarjeta</label>
+          <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+
+          <label>Fecha de expiración (MM/AA)</label>
+          <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required>
+
+          <label>CVV</label>
+          <input type="password" id="cardCvv" placeholder="123" maxlength="3" required>
+
+          <div style="display:flex; gap:12px; align-items:center; margin-top:6px">
+            <button type="submit" class="pay-btn">Pagar ahora</button>
+            <a href="inicio.html" style="margin-left:8px; text-decoration:none; color:#333">Seguir comprando</a>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="center"></div>
+  </div>
+
+  <script>
+    (function(){
+      function formatCurrency(n){ return '$' + n.toFixed(2) }
+
+      const cartEl = document.getElementById('cart');
+      let cart = [];
+      try{ cart = JSON.parse(localStorage.getItem('cart') || '[]') }catch(e){ cart = [] }
+
+      // Initialize inventory if missing (use product cards on inicio.html as source)
+      function initInventoryFromProducts(){
+        try{
+          const existing = JSON.parse(localStorage.getItem('inventory') || 'null');
+          if(existing && typeof existing === 'object') return existing;
+        }catch(e){}
+        // if not present, create defaults (names and 20 stock)
+        const inv = {};
+        // Try to infer from cart or products in DOM (if any product-card not in this page, default 20)
+        // We'll set defaults for names in cart
+        try{ const cartTmp = JSON.parse(localStorage.getItem('cart')||'[]'); cartTmp.forEach(function(it){ if(!inv[it.name]) inv[it.name]=20; }); }catch(e){}
+        localStorage.setItem('inventory', JSON.stringify(inv));
+        return inv;
+      }
+      initInventoryFromProducts();
+
+      // Reposición automática: cada 2 horas restaurar stock a valores iniciales (para los productos conocidos)
+      const RESTOCK_INTERVAL = 2 * 60 * 60 * 1000;
+        const DEFAULT_PRODUCTS = ['Vela Lavanda', 'Vela Eucalipto', 'Vela Rosas', 'Vela Cítricos', 'Vela Vainilla', 'Vela Jazmín', 'Vela Sándalo', 'Vela Coco', 'Vela Té Verde'];
+      function initRestockCheckout(){
+        const now = Date.now();
+        const last = parseInt(localStorage.getItem('lastRestock')||'0',10) || 0;
+        if(!last){ localStorage.setItem('lastRestock', String(now)); return; }
+        if(now - last >= RESTOCK_INTERVAL){
+          const inv = JSON.parse(localStorage.getItem('inventory')||'{}');
+          DEFAULT_PRODUCTS.forEach(function(name){ inv[name] = parseInt(20,10); });
+          localStorage.setItem('inventory', JSON.stringify(inv));
+          localStorage.setItem('lastRestock', String(now));
+        }
+      }
+      function formatTime(ms){
+        const total = Math.max(0, Math.floor(ms/1000));
+        const h = Math.floor(total/3600); const m = Math.floor((total%3600)/60); const s = total%60;
+        return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      }
+      function updateRestockTimerCheckout(){
+        const last = parseInt(localStorage.getItem('lastRestock')||'0',10) || 0;
+        const next = last + RESTOCK_INTERVAL; const diff = Math.max(0, next - Date.now());
+        const el = document.getElementById('restockTimer'); if(el) el.textContent = 'Reposición en: ' + formatTime(diff);
+      }
+      initRestockCheckout(); setInterval(function(){ initRestockCheckout(); renderCart(); updateRestockTimerCheckout(); }, 1000);
+
+      // Función para reiniciar inventario (botón de pruebas)
+      function resetInventoryToDefaultsCheckout(){
+        try{
+          const inv = JSON.parse(localStorage.getItem('inventory')||'{}');
+          DEFAULT_PRODUCTS.forEach(function(name){ inv[name] = 20; });
+          localStorage.setItem('inventory', JSON.stringify(inv));
+          localStorage.setItem('lastRestock', String(Date.now()));
+          updateRestockTimerCheckout();
+          renderCart();
+          alert('Inventario reiniciado a valores iniciales.');
+        }catch(e){ console.error(e); alert('No se pudo reiniciar el inventario.'); }
+      }
+
+      const resetBtnCheckout = document.getElementById('resetInventoryButton');
+      if(resetBtnCheckout) resetBtnCheckout.addEventListener('click', function(){ if(confirm('¿Restablecer inventario a valores iniciales?')) resetInventoryToDefaultsCheckout(); });
+
+      const DEFAULT_PRODUCT_IMAGES = {
+        'Vela Lavanda': 'images/vela_lavanda.jpg',
+        'Vela Eucalipto': 'images/vela_eucalipto.jpg',
+        'Vela Rosas': 'images/vela_rosas.jpg',
+        'Vela Cítricos': 'images/vela_citricos.jpg',
+        'Vela Vainilla': 'images/vela_vainilla.jpg',
+        'Vela Jazmín': 'images/vela_jazmin.jpg',
+        'Vela Sándalo': 'images/vela_sandalo.jpg',
+        'Vela Coco': 'images/vela_coco.jpg',
+        'Vela Té Verde': 'images/vela_te_verde.jpg'
+      };
+
+      function renderCart(){
+        try{ cart = JSON.parse(localStorage.getItem('cart') || '[]') }catch(e){ cart = [] }
+        const paymentSection = document.getElementById('paymentSection');
+        if(!cart.length){
+          cartEl.innerHTML = '<p>Tu carrito está vacío.</p>' +
+            '<div class="empty-actions" style="margin-top:12px; display:flex; gap:10px">' +
+              '<button id="btnBackToStore" class="empty-btn">Volver a la tienda</button>' +
+              '<button id="btnExitStore" class="empty-btn empty-exit">Salir de la tienda</button>' +
+            '</div>';
+          if(paymentSection) paymentSection.style.display = 'none';
+          // attach actions
+          const backBtn = document.getElementById('btnBackToStore');
+          const exitBtn = document.getElementById('btnExitStore');
+          if(backBtn) backBtn.addEventListener('click', function(){ window.location.href = 'inicio.html'; });
+          if(exitBtn) exitBtn.addEventListener('click', function(){ window.location.href = 'index.html'; });
+          return;
+        }
+        if(paymentSection) paymentSection.style.display = '';
+        // load inventory
+        let inv = {};
+        try{ inv = JSON.parse(localStorage.getItem('inventory')||'{}') }catch(e){ inv = {} }
+
+        let html = '';
+        let total = 0;
+        cart.forEach(function(item, i){
+          const available = (inv[item.name] == null ? 20 : inv[item.name]);
+          const lineTotal = (item.price || 0) * (item.qty || 1);
+          total += lineTotal;
+          const thumb = DEFAULT_PRODUCT_IMAGES[item.name] ? `<span class="cart-thumb"><img src="${DEFAULT_PRODUCT_IMAGES[item.name]}" alt="${item.name}" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<div class=\'thumb-fallback\'>🕯️</div>')"></span>` : '';
+          html += `
+            <div class="cart-item" data-index="${i}">
+              <div style="display:flex; gap:10px; align-items:center">
+                ${thumb}
+                <strong>${item.name}</strong>
+                <div style="display:flex; align-items:center; gap:6px; margin-left:12px">
+                  <button class="qty-decrease" data-index="${i}">-</button>
+                  <span class="qty">${item.qty}</span>
+                  <button class="qty-increase" data-index="${i}">+</button>
+                </div>
+                <div style="margin-left:12px; font-size:13px; color:#666">Disponibles: <span class="available">${available}</span></div>
+              </div>
+              <div>${formatCurrency(lineTotal)}</div>
+            </div>`;
+        });
+        html += `<div style="padding-top:8px; font-weight:700; text-align:right">Total: ${formatCurrency(total)}</div>`;
+        cartEl.innerHTML = html;
+
+        // attach events to + and - buttons with stock checks
+        cartEl.querySelectorAll('.qty-increase').forEach(function(b){
+          b.addEventListener('click', function(){
+            const idx = parseInt(b.getAttribute('data-index'));
+            try{ inv = JSON.parse(localStorage.getItem('inventory')||'{}') }catch(e){ inv = {} }
+            const available = (inv[cart[idx].name] == null ? 20 : inv[cart[idx].name]);
+            const currentQty = cart[idx].qty || 1;
+            if(currentQty + 1 > available){ alert('No hay más unidades disponibles para ' + cart[idx].name); return; }
+            cart[idx].qty = currentQty + 1;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+          });
+        });
+        cartEl.querySelectorAll('.qty-decrease').forEach(function(b){
+          b.addEventListener('click', function(){
+            const idx = parseInt(b.getAttribute('data-index'));
+            cart[idx].qty = (cart[idx].qty || 1) - 1;
+            if(cart[idx].qty <= 0){ cart.splice(idx,1); }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+          });
+        });
+      }
+      renderCart();
+
+      // formateo del número de tarjeta: insertar guion cada 4 dígitos
+      const cardNumberInput = document.getElementById('cardNumber');
+      function formatCardNumber(value){
+        return value.replace(/\D/g,'').replace(/(.{4})/g,'$1-').replace(/-$/,'');
+      }
+      cardNumberInput.addEventListener('input', function(e){
+        const pos = cardNumberInput.selectionStart;
+        const raw = cardNumberInput.value.replace(/\D/g,'');
+        const formatted = formatCardNumber(raw);
+        cardNumberInput.value = formatted;
+        // try to restore cursor near end (simple strategy)
+        cardNumberInput.selectionStart = cardNumberInput.selectionEnd = formatted.length;
+      });
+
+      // formateo del expiry: auto-insertar '/' después de 2 dígitos y limitar a 4 dígitos en total
+      const cardExpiry = document.getElementById('cardExpiry');
+      function formatExpiry(value){
+        let digits = (value || '').replace(/\D/g,'').slice(0,4); // máximo 4 dígitos (MMYY)
+        if(digits.length === 0) return '';
+        if(digits.length <= 2){
+          // validar/ajustar el mes cuando tenga 2 dígitos
+          if(digits.length === 1){
+            // si el primer dígito es mayor a '1', asumimos un 0 delante (ej. '3' -> '03')
+            if(parseInt(digits,10) > 1) return '0' + digits;
+            return digits;
+          }
+          // dos dígitos: clamp entre 01 y 12
+          let mm = parseInt(digits,10);
+          if(isNaN(mm) || mm <= 0) mm = 1;
+          if(mm > 12) mm = 12;
+          return (mm < 10 ? '0' + mm : String(mm));
+        }
+        // 3 or 4 digits -> formato MM/YY
+        let mm = parseInt(digits.slice(0,2),10);
+        if(isNaN(mm) || mm <= 0) mm = 1;
+        if(mm > 12) mm = 12;
+        const yy = digits.slice(2);
+        const mmStr = (mm < 10 ? '0' + mm : String(mm));
+        return mmStr + '/' + yy;
+      }
+      cardExpiry.addEventListener('input', function(){
+        const before = cardExpiry.value;
+        const formatted = formatExpiry(before);
+        cardExpiry.value = formatted;
+        // move cursor to end for simplicity
+        cardExpiry.selectionStart = cardExpiry.selectionEnd = cardExpiry.value.length;
+      });
+
+      // also handle paste to clean input
+      cardExpiry.addEventListener('paste', function(e){
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+        const formatted = formatExpiry(text);
+        cardExpiry.value = formatted;
+      });
+
+      // CVV: permitir sólo números y máximo 3 dígitos
+      const cardCvvInput = document.getElementById('cardCvv');
+      cardCvvInput.addEventListener('input', function(){
+        this.value = this.value.replace(/\D/g,'').slice(0,3);
+      });
+
+      const form = document.getElementById('paymentForm');
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        // recolectar datos mínimos (esto es un mock; NO procesamos tarjetas realmente)
+        const name = document.getElementById('cardName').value.trim();
+        const number = document.getElementById('cardNumber').value.replace(/[^0-9]/g,'');
+        const expiry = document.getElementById('cardExpiry').value.trim();
+        const cvv = document.getElementById('cardCvv').value.trim();
+
+        // expiry debe tener formato MM/AA (5 caracteres con '/'), y 4 dígitos en total
+        const expiryDigits = expiry.replace(/\D/g,'');
+        if(!name || number.length < 12 || expiryDigits.length !== 4 || cvv.length !== 3){
+          alert('Por favor ingresa datos de tarjeta válidos (esto es una simulación).');
+          return;
+        }
+
+        // guardar orden en localStorage
+        const order = { items: cart, total: cart.reduce((s,i)=>s+((i.price||0)*(i.qty||1)),0), payment: { cardName: name, last4: number.slice(-4), date: new Date().toISOString() } };
+        try{
+          const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+          orders.push(order);
+          localStorage.setItem('orders', JSON.stringify(orders));
+          // actualizar inventario: restar cantidades compradas
+          try{
+            const inv = JSON.parse(localStorage.getItem('inventory') || '{}');
+            cart.forEach(function(it){
+              if(!inv[it.name] && inv[it.name] !== 0) {
+                // default to 20 if not present
+                inv[it.name] = 20 - (it.qty || 0);
+              } else {
+                inv[it.name] = Math.max(0, (inv[it.name] || 0) - (it.qty || 0));
+              }
+            });
+            localStorage.setItem('inventory', JSON.stringify(inv));
+          }catch(e){ console.error('Error actualizando inventario', e) }
+
+          // limpiar carrito
+          localStorage.removeItem('cart');
+        }catch(err){ console.error(err) }
+
+        // redirigir a página de éxito
+        window.location.href = 'compra-exitosa.html';
+      });
+    })();
+  </script>
+</body>
+</html>

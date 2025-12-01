@@ -1,1 +1,79 @@
-<hi>Github pages test</hi>
+<!DOCTYPE html>
+<html lang="es-MEX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BellaVela - Inicio</title>
+    <link rel="stylesheet" href="sytle.css">
+</head>
+
+<body>
+
+<div class="layout">
+    <div class="left">
+        <div class="contenedor">
+            <h1>Bienvenido a BellaVela</h1>
+            <p>Ingresa a nuestro sitio de venta</p>
+
+            <!-- FORMULARIO SOLO PARA LOGIN → NO GUARDA NADA -->
+            <form id="loginForm">
+                <input id="loginName" type="text" placeholder="Nombre Completo">
+                <input id="loginEmail" type="email" placeholder="Correo Electrónico">
+                <input id="loginPassword" type="password" placeholder="Contraseña">
+
+                <button type="submit" id="loginBtn">Ingresar</button>
+
+                <a href="registro.html" class="registro-btn">Regístrate Aquí</a>
+
+                <p id="msg" style="color:red; font-weight:bold; margin-top:10px;"></p>
+            </form>
+        </div>
+    </div>
+
+    <div class="center">
+        <img src="fondo 2.jpg" alt="fondo 2">
+    </div>
+</div>
+
+
+<!-- SCRIPT DE VALIDACIÓN -->
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault(); // evita enviar el formulario
+
+    const msg = document.getElementById("msg");
+
+    // Verificar bandera de registro guardada desde registro.html
+    const flag = localStorage.getItem("userRegistered");
+
+    // Leer lista de registros reales
+    const registros = JSON.parse(localStorage.getItem("registrations") || "[]");
+
+    // Si no hay registros → no dejar entrar
+    if (flag !== "1" || registros.length === 0) {
+        msg.textContent = "Primero debes registrarte.";
+        return;
+    }
+
+    // Tomar el último registro válido
+    const ultimo = registros[registros.length - 1];
+
+    // Validar que esté completo
+    const nombreValido    = ultimo.name && ultimo.name.trim() !== "";
+    const edadValida      = ultimo.age && parseInt(ultimo.age) >= 18;
+    const telefonoValido  = ultimo.phone && ultimo.phone.trim() !== "";
+    const emailValido     = ultimo.email && ultimo.email.trim() !== "";
+
+    // Si NO cumple todo → bloquear ingreso
+    if (!nombreValido || !edadValida || !telefonoValido || !emailValido) {
+        msg.textContent = "Primero debes registrarte correctamente.";
+        return;
+    }
+
+    // ✔ Si todo está ok → permitir ingresar
+    window.location.href = "inicio.html";
+});
+</script>
+
+</body>
+</html>

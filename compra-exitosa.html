@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Compra exitosa</title>
+  <link rel="stylesheet" href="sytle.css">
+  <style>
+    .success { max-width:720px; margin:40px auto; padding:20px; background:rgba(255,255,255,0.95); border-radius:10px }
+    .success h2 { margin-top:0 }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="left">
+      <div class="contenedor success">
+        <h2>¡Pago procesado!</h2>
+        <p>Gracias por tu compra. Aquí está el resumen de tu pedido:</p>
+        <div id="orderSummary">
+          <p>Cargando...</p>
+        </div>
+        <div style="margin-top:12px"><a href="inicio.html" style="text-decoration:none; padding:8px 12px; background:#ce6da2; color:#fff; border-radius:8px">Volver a la tienda</a></div>
+      </div>
+    </div>
+    <div class="center"></div>
+  </div>
+
+  <script>
+    (function(){
+      try{
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const el = document.getElementById('orderSummary');
+        if(!orders.length){ el.innerHTML = '<p>No se encontró información de la orden.</p>'; return; }
+        const last = orders[orders.length-1];
+        let html = '';
+        let total = 0;
+        last.items.forEach(function(it){ html += `<div style="display:flex; justify-content:space-between; padding:6px 0">${it.name} x${it.qty} <span>${'$'+((it.price||0)*(it.qty||1)).toFixed(2)}</span></div>`; total += (it.price||0)*(it.qty||1); });
+        html += `<div style="padding-top:8px; font-weight:700; text-align:right">Total: $${total.toFixed(2)}</div>`;
+        html += `<div style="margin-top:10px; color:#666">Pago con tarjeta terminada en ${last.payment.last4} — ${new Date(last.payment.date).toLocaleString()}</div>`;
+        el.innerHTML = html;
+      }catch(err){ console.error(err) }
+    })();
+  </script>
+</body>
+</html>

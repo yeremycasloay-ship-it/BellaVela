@@ -1,0 +1,200 @@
+/* Reset y tipografía */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  /* Fondo principal: usar 'fondo 4.jpg' */
+  background: url("fondo 4.jpg") center/cover no-repeat fixed;
+}
+
+/* Layout principal: texto a la izquierda, imagen en el centro */
+.layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.left {
+  flex: 0 0 360px; /* ancho fijo aproximado para el bloque de texto */
+  display: flex;
+  align-items: center; /* centrar verticalmente */
+}
+
+.contenedor {
+  width: 100%;
+  padding: 24px;
+  background-color: #FFFBE6;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.contenedor h1 {
+  margin: 0 0 6px 0;
+}
+
+.contenedor p {
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+.contenedor form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contenedor input,
+.contenedor button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.contenedor input {
+  border: 1px solid #ccc;
+}
+
+.contenedor button {
+  background-color: #ce6da2;
+  color: #0c0303;
+  border: none;
+  cursor: pointer;
+}
+
+.contenedor button:hover { background-color: #e271a4; }
+
+/* Centro: imagen principal (usa "fondo 2.jpg") */
+.center {
+  flex: 1 1 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center img {
+  /* Ocultamos la imagen central porque usamos el fondo de la página */
+  display: none;
+}
+
+/* Responsive: en pantallas estrechas apilar verticalmente */
+@media (max-width: 860px) {
+  .layout { flex-direction: column-reverse; gap: 16px; }
+  .left { flex: none; width: 100%; }
+  .center { width: 100%; }
+  .center img { max-height: 45vh; display:block }
+}
+
+/* Estilos para la página de inicio (productos) */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.product-card {
+  background: rgba(255,255,255,0.9);
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.product-media {
+  width:100%; height:110px; display:flex; align-items:center; justify-content:center; font-size:40px; background:#fff; border-radius:8px; overflow:hidden;
+}
+
+.product-media img { width:100%; height:100%; object-fit:cover; display:block }
+
+.product-card h3 { margin:0 }
+.product-card p { margin:0; color:#555; font-size:14px }
+.product-actions { display:flex; justify-content:space-between; align-items:center; margin-top:8px }
+.product-actions .price { font-weight:700 }
+.product-actions .buy { background:#ce6da2; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer }
+
+@media (max-width:480px) {
+  .product-media { height:90px }
+}
+
+/* Hero (intro) section on inicio.html: título y texto en blanco */
+.hero h2 {
+  color: #ffffff;
+  margin: 0 0 8px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+.hero p {
+  color: #ffffff;
+  margin: 0 0 16px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Small cart counter in header - make more visible */
+#cartButton {
+  font-weight:700;
+  background: linear-gradient(90deg,#ff7a59,#ff5a7a);
+  color: #fff; padding:6px 10px; border-radius:8px; text-decoration:none; box-shadow:0 6px 18px rgba(255,90,90,0.18);
+}
+#cartButton:hover { transform:translateY(-1px) }
+#cartCount { background:#fff; color:#000; padding:4px 8px; border-radius:12px; min-width:22px; text-align:center; display:inline-block; font-weight:700 }
+
+/* Header nav links and cart text bold */
+header nav a { font-weight: 700; }
+header nav a span { font-weight: 700; }
+
+/* Explicit cart icon and count bold */
+#cartButton .cart-icon { font-weight: 700; }
+#cartCount { font-weight: 700; }
+
+/* Quantity input on product cards */
+.qty-input { width:64px; padding:6px 8px; border-radius:6px; border:1px solid #ccc; text-align:center }
+.product-actions input.qty-input { font-size:14px }
+
+/* Checkout tweaks for qty buttons */
+.cart-item button { background:#f0f0f0; border:none; padding:4px 8px; border-radius:6px; cursor:pointer }
+.cart-item .qty { min-width:20px; display:inline-block; text-align:center }
+
+/* Price details styling (moved from inline) */
+.price-details { margin-left:8px; font-weight:700 }
+
+/* Flash animation when subtotal changes */
+.price-details.flash { animation: flashPrice 700ms ease; }
+@keyframes flashPrice {
+  0% { transform: scale(1); background: rgba(0,0,0,0); }
+  30% { transform: scale(1.03); background: rgba(206,109,162,0.08); }
+  100% { transform: scale(1); background: rgba(0,0,0,0); }
+}
+
+/* Estilos para checkout y confirmación (básicos) */
+.cart-list { font-size:15px }
+.cart-item { align-items:center }
+.checkout .pay-btn { background:#ce6da2 }
+
+/* Utility classes moved from inline styles */
+.actions-row { display:flex; gap:8px; align-items:center }
+.stock-row { margin-top:8px; font-size:13px; color:#333 }
+.reset-inventory { padding:6px 10px; border-radius:6px; background:#f3f3f3; cursor:pointer; border:1px solid #ddd }
+.reset-inventory:hover { background:#eee }
+
+/* Thumbnails in checkout cart */
+.cart-thumb img { width:80px; height:80px; object-fit:cover; border-radius:8px; margin-right:12px; display:block }
+.thumb-fallback { width:80px; height:80px; display:flex; align-items:center; justify-content:center; background:#f6f6f6; border-radius:8px; margin-right:12px; font-size:28px }
+
+/* Empty cart actions */
+.empty-actions { margin-top:12px; display:flex; gap:10px }
+.empty-btn { padding:10px 14px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer }
+.empty-btn.empty-exit { background:#ff6b6b; color:#fff; border-color:transparent }
+.empty-btn:hover { filter:brightness(0.98) }
+
+/* Contact card styling */
+.contact-card { background: rgba(255,255,255,0.9); padding:14px; border-radius:8px; box-shadow:0 6px 12px rgba(0,0,0,0.04) }
+.contact-card h3 { margin:0 0 6px }
+.contact-card p { margin:0; color:#333 }
+.contact-card strong { margin-right:6px }
+
